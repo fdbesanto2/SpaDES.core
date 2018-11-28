@@ -336,6 +336,9 @@ setMethod(
                            eval(pf[[1]][[3]][inObjs][[1]]))
             )
           )
+          inObjNames <- sim@depends@dependencies[[i]]@inputObjects$objectName
+          names(inObjNames) <- inObjNames
+          list2env(lapply(inObjNames, function(x) NULL), envir = sim@.xData)
         }
 
         if (any(outObjs)) {
@@ -345,6 +348,9 @@ setMethod(
                            eval(pf[[1]][[3]][outObjs][[1]]))
             )
           )
+          outObjNames <- sim@depends@dependencies[[i]]@outputObjects$objectName
+          names(outObjNames) <- outObjNames
+          list2env(lapply(outObjNames, function(x) NULL), envir = sim@.xData)
         }
 
         # add child modules to list of all child modules, to be parsed later

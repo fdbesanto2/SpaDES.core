@@ -441,7 +441,7 @@ setMethod(
         # need to keep the tmpl slots ...
         # i.e., Caching of simLists is mostly about objects in .xData
         #   makes soft copy of all objects, i.e., they have the identical objects, which are pointers only
-        object2 <- Copy(tmpl[[whSimList]], objects = FALSE)
+        object2 <- Copy(tmpl[[whSimList]], objects = TRUE)
 
         currModules <- currentModule(tmpl[[whSimList]])
         # Convert to numeric index, as some modules don't have names

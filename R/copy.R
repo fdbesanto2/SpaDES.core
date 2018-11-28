@@ -86,6 +86,7 @@ setMethod("Copy",
 
             }
             sim_@.envir <- sim_@.xData
+            lockEnvironment(sim_)
             return(sim_)
 })
 

@@ -341,7 +341,13 @@ setMethod(
     sim <- new("simList")
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = sim@.xData)
-    on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
+    on.exit({
+
+      rm(".parsedFiles", envir = sim@.xData)
+      lockEnvironment(sim@.xData)
+
+    }
+            , add = TRUE )
 
     # paths
     oldGetPaths <- .paths()
@@ -694,7 +700,10 @@ setMethod(
     # sim$.sessionInfo <- sessionInfo() # commented out because it gives too much information
                                         # i.e., it includes all packages in a user search
                                         #  path, which is not necessarily the correct info
-
+    browser()
+    sim@.xData[["._startClockTime"]] <- NULL
+    sim@.xData[[".timeunits"]] <- NULL
+    sim@.xData[["._firstEventClockTime"]] <- NULL
     return(invisible(sim))
 })
 

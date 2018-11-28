@@ -60,6 +60,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan) {
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <- sim@current
+
   if  (length(cur) == 0) {
     # Test replacement for speed
     #slot(sim, "simtimes")[["current"]] <- sim@simtimes[["end"]] + 1
@@ -740,7 +741,8 @@ setMethod(
     on.exit({
       if (!.pkgEnv[["skipNamespacing"]])
         .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
-      rm(".timeunits", envir = sim@.xData)
+      sim$.timeunits <- NULL
+      #rm(".timeunits", envir = sim@.xData)
     }, add = TRUE)
 
     if (!is.null(.plotInitialTime)) {

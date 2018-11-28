@@ -140,3 +140,65 @@ test_that("local mod object", {
   expect_true(out4$test2$y == "This module is test2")
 
 })
+
+
+test_that("nuking module environment and activeBinding", {
+  testInitOut <- testInit(smcc = FALSE, debug = FALSE)
+  on.exit({
+    testOnExit(testInitOut)
+  }, add = TRUE)
+
+  newModule("test", tmpdir, open = FALSE)
+
+  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+  cat(file = file.path(tmpdir, "test", "test.R"),'
+      defineModule(sim, list(
+      name = "test",
+      description = "insert module description here",
+      keywords = c("insert key words here"),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      childModules = character(0),
+      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      timeframe = as.POSIXlt(c(NA, NA)),
+      timeunit = "second",
+      citation = list("citation.bib"),
+      documentation = list("README.txt", "test.Rmd"),
+      reqdPkgs = list(),
+      parameters = rbind(
+      ),
+      inputObjects = bind_rows(
+      expectsInput("sdf", "sdf", "sdfd")
+      ),
+      outputObjects = bind_rows(
+      )
+      ))
+
+      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+      switch(
+      eventType,
+      init = {
+      mod$a <- 2
+
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
+      },
+      event1 = {
+      rm(list = "test", envir = sim)
+      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
+      })
+      return(invisible(sim))
+      }
+
+      .inputObjects <- function(sim) {
+      mod$x <- "sdf"
+      return(sim)
+
+      }
+      ', fill = TRUE)
+
+  mySim <- simInit(times = list(start = 0, end = 2),
+                   paths = list(modulePath = tmpdir), modules = c("test"))
+
+  expect_error(out <- spades(mySim), "cannot remove")
+
+  })
